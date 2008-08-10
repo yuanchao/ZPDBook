@@ -1,0 +1,6 @@
+[Desktop Entry]
+Comment=A searchable Particle Data Booklet
+Exec=zpdg
+Icon=zpdg
+Type=Application
+Name=zPDG

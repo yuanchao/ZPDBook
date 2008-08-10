@@ -1,0 +1,256 @@
+<!DOCTYPE UI><UI>
+<class>ZPDGBase</class>
+<widget>
+    <class>QWidget</class>
+    <property stdset="1">
+        <name>name</name>
+        <cstring>ZPDGBase</cstring>
+    </property>
+    <property stdset="1">
+        <name>geometry</name>
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>243</width>
+            <height>314</height>
+        </rect>
+    </property>
+    <property stdset="1">
+        <name>caption</name>
+        <string>ZPDBooklet</string>
+    </property>
+    <property>
+        <name>layoutMargin</name>
+    </property>
+    <property>
+        <name>layoutSpacing</name>
+    </property>
+    <grid>
+        <property stdset="1">
+            <name>margin</name>
+            <number>3</number>
+        </property>
+        <property stdset="1">
+            <name>spacing</name>
+            <number>3</number>
+        </property>
+        <widget row="0"  column="0" >
+            <class>QLayoutWidget</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>Layout16</cstring>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <vbox>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>0</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>0</number>
+                </property>
+                <widget>
+                    <class>QListBox</class>
+                    <item>
+                        <property>
+                            <name>text</name>
+                            <string>None</string>
+                        </property>
+                    </item>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>lb_particles</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>hScrollBarMode</name>
+                        <enum>AlwaysOff</enum>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QLineEdit</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>ed_particle</cstring>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>bt_search</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Search</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget row="0"  column="1" >
+            <class>QLayoutWidget</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>Layout18</cstring>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <vbox>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>0</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>0</number>
+                </property>
+                <widget>
+                    <class>QLabel</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>tl_pid</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>PID: 000000 J: 0.5
+Charges: 00</string>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QGroupBox</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>gb_mass</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>title</name>
+                        <string>Mass:</string>
+                    </property>
+                    <property>
+                        <name>layoutMargin</name>
+                    </property>
+                    <property>
+                        <name>layoutSpacing</name>
+                    </property>
+                    <vbox>
+                        <property stdset="1">
+                            <name>margin</name>
+                            <number>3</number>
+                        </property>
+                        <property stdset="1">
+                            <name>spacing</name>
+                            <number>0</number>
+                        </property>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_mass</cstring>
+                            </property>
+                        </widget>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_massp</cstring>
+                            </property>
+                        </widget>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_massm</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget>
+                    <class>QGroupBox</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>gb_width</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>title</name>
+                        <string>Width:</string>
+                    </property>
+                    <property>
+                        <name>layoutMargin</name>
+                    </property>
+                    <property>
+                        <name>layoutSpacing</name>
+                    </property>
+                    <vbox>
+                        <property stdset="1">
+                            <name>margin</name>
+                            <number>3</number>
+                        </property>
+                        <property stdset="1">
+                            <name>spacing</name>
+                            <number>0</number>
+                        </property>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_width</cstring>
+                            </property>
+                        </widget>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_widthp</cstring>
+                            </property>
+                        </widget>
+                        <widget>
+                            <class>QLineEdit</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>ed_widthm</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+        <widget row="1"  column="0"  rowspan="1"  colspan="2" >
+            <class>QMultiLineEdit</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>ed_memo</cstring>
+            </property>
+            <property stdset="1">
+                <name>readOnly</name>
+                <bool>true</bool>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>bt_search</sender>
+        <signal>clicked()</signal>
+        <receiver>ZPDGBase</receiver>
+        <slot>doSearch()</slot>
+    </connection>
+    <connection>
+        <sender>lb_particles</sender>
+        <signal>doubleClicked(QListBoxItem*)</signal>
+        <receiver>ZPDGBase</receiver>
+        <slot>goDecay(QListBoxItem*)</slot>
+    </connection>
+    <connection>
+        <sender>lb_particles</sender>
+        <signal>highlighted(int)</signal>
+        <receiver>ZPDGBase</receiver>
+        <slot>doSelect(int)</slot>
+    </connection>
+    <slot access="public">doSearch()</slot>
+    <slot access="public">doSelect(int)</slot>
+    <slot access="public">goDecay(QListBoxItem*)</slot>
+</connections>
+</UI>
