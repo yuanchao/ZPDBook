@@ -18,8 +18,9 @@ int pids[4], last_pid, i, j;
 int m_num_ptl=0;
 char charges[16], *m_charge;
 char buf1[256], buf2[256], m_name[32];
-char buff[256*5]="";
+char buff[256]="";
 double m_value, m_errp, m_errm;
+double w_value, w_errp, w_errm;
 
 /* 
  *  Constructs a ZPDG which is a child of 'parent', with the 
@@ -31,7 +32,8 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
 //    QMessageBox::about( this, "About",
 //                              "<p>This program shows PDG data" );
 
-  datafile=fopen("/home/QtPalmtop/pics/zpdg/mass_width.mc", "r");
+  //datafile=fopen("/home/QtPalmtop/pics/zpdg/mass_width.mc", "r");
+  datafile=fopen("/home/QtPalmtop/pics/zpdg/mass_width.csv", "r");
   //datafile=fopen("/opt/Qtopia/share/zpdg/mass_width.mc", "r");
   //if(datafile==NULL){
   //  datafile=fopen("/mnt/card/opt/Qtopia/share/zpdg/mass_width.mc", "r");
@@ -39,48 +41,53 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
 
   if(datafile!=NULL){
     while(!feof(datafile)){
-      fgets(buff, 92, datafile);
-      pids[0]=pids[1]=pids[2]=pids[3]=0;
+      fgets(buff, 256, datafile);
 
-      if(buff[0]=='M'||buff[0]=='W'){
-        buff[33]='\0';
-        sscanf(buff+1, "%8d%8d%8d%8d",
-               &pids[0], &pids[1], &pids[2], &pids[3]);
-        sscanf(buff+35, "%15lf %8lf %8lf", &m_value, &m_errp, &m_errm);
-        sscanf(buff+68, "%s %s\n", m_name, charges);
-        m_charge=strtok(charges, ",");
-        if(pids[0]==last_pid && pids[0]!=0){
-          i=m_num_ptl-j;
-        }else{
-          for(i=0;i<m_num_ptl&& pids[0]!=m_records[i].pid;i++);
-        }
+      if(buff[0]!='*'){  //skip comments
+        buff[255]='\0';
 
-        if(i>=m_num_ptl){
-          for(j=0; j<4&&pids[j]!=0; j++){
-            m_records[i+j].pid=pids[j];
-            strcpy(m_records[i+j].name, m_name);
-            strcpy(m_records[i+j].charge, m_charge);
-            m_records[i+j].mass=-1;
-            m_records[i+j].width=-1;
-            m_charge=strtok(NULL, ",");
-          }
-          last_pid=pids[0];
-          m_num_ptl+=j;
-        }
-        if(buff[0]=='M'){
-          for(j=0; j<4&&pids[j]!=0; j++){
-            m_records[i+j].mass=m_value;
-            m_records[i+j].mass_errp=m_errp;
-            m_records[i+j].mass_errm=m_errm;
-          }
-        }else if(buff[0]=='W'){
-          for(j=0; j<4&&pids[j]!=0; j++){
-            m_records[i+j].width=m_value;
-            m_records[i+j].width_errp=m_errp;
-            m_records[i+j].width_errm=m_errm;
-          }
-        }
+        sscanf(buff, "%11lf,%9lf,%9lf,%11lf,%9lf,%9lf",
+	       &m_records[i].mass, &m_records[i].mass_errp,
+	       &m_records[i].mass_errm,
+	       &m_records[i].width, &m_records[i].width_errp,
+	       &m_records[i].width_errm);
 
+	buff[67]='\0';
+        sscanf(buff+64, "%3s", m_records[i].isospin);
+
+	m_records[i].G=buff[68];
+
+	buff[74]='\0';
+        sscanf(buff+70, "%4s", m_records[i].J);
+
+	m_records[i].parity=buff[75];
+	m_records[i].C=buff[77];
+	m_records[i].anti=buff[79];
+
+	/*
+        sscanf(buff+81, "%7d,%s,%1c,%1c,%17s,%s",
+	       &m_records[i].pid, m_records[i].charge,
+	       &m_records[i].rank, &m_records[i].status,
+	       m_records[i].name, m_records[i].quarks);
+	*/
+	buff[93]='\0';
+        sscanf(buff+81, "%7d,%s",
+	       &m_records[i].pid, m_records[i].charge);
+
+	m_records[i].rank=buff[94];
+	m_records[i].status=buff[96];
+
+	buff[115]='\0';
+	buff[133]='\0';
+        sscanf(buff+98, "%17s", m_records[i].name);
+        sscanf(buff+116, "%15s", m_records[i].quarks);
+
+	if(strncmp(buff+116, "Maybe", 5)==0){
+	  buff[128]='\0';
+	  strcpy(m_records[i].quarks, buff+116);
+	}
+
+	i++;
       }
     }
     m_num_ptl=i;
@@ -94,14 +101,16 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
     this->lb_particles->clear();
     for(int i=0; i<m_num_ptl; i++){
       //sprintf(buff, "%s%s", m_records[i].name, m_records[i].charge);
-      QString qbuff(tr(m_records[i].name)+tr(m_records[i].charge));
+      buff[0]=m_records[i].charge[0];
+      buff[1]='\0';
+      QString qbuff(tr(m_records[i].name)+tr(buff));
       if(m_records[i].charge[0]=='0')
         qbuff=tr(m_records[i].name);
       
       this->lb_particles->insertItem(qbuff);
     }
     this->lb_particles->setSelected(0, TRUE);
-    
+    goDecay(this->lb_particles->item(0));
 }
 
 /*  
@@ -164,6 +173,7 @@ void ZPDG::doSearch()
       if(i<=m_num_ptl){
         this->lb_particles->setCurrentItem(i);
         doSelect(i);
+	goDecay(this->lb_particles->item(i));
         this->ed_particle->setText(text);
       }else{
         this->ed_particle->setText(text+tr("Not Found!"));
@@ -173,7 +183,8 @@ void ZPDG::doSearch()
     }
     //SetFocus(GetDlgItem (hDlg, ID_EDIT_FIND));
     this->ed_particle->setFocus();
-
+    //goDecay(this->lb_particles->item(this->lb_particles->currentItem()));
+    //doSelect(this->lb_particles->currentItem());
 }
 /* 
  * public slot
@@ -221,6 +232,26 @@ void ZPDG::goDecay(QListBoxItem* item)
 
   this->ed_memo->clear();
 
+  sprintf(buff, "Particle: %s  { %s }\n",
+	  m_records[curr_idx].name, m_records[curr_idx].quarks);
+
+  if(m_records[curr_idx].quarks[0]=='\0')
+    sprintf(buff, "Particle: %s\n", m_records[curr_idx].name);
+
+  memo=memo+QString(buff);
+
+  sprintf(buff,"I= %s \t G= %c \t J= %s\nP= %c \t C= %c \t A= %c\n",
+	  m_records[curr_idx].isospin, m_records[curr_idx].G,
+	  m_records[curr_idx].J, m_records[curr_idx].parity,
+	  m_records[curr_idx].C, m_records[curr_idx].anti);
+
+  memo=memo+QString(buff);
+
+  sprintf(buff, "Rank= %c \t Status= %c\n",
+	  m_records[curr_idx].rank, m_records[curr_idx].status);
+
+  memo=memo+QString(buff);
+
   if( item ){
     text=item->text();
     this->ed_memo->setText(tr("Searching"));
@@ -228,15 +259,11 @@ void ZPDG::goDecay(QListBoxItem* item)
     return;
   }
 
-  memo=memo+"        ID stable                                      min    max\n";
-  memo=memo+"name   code code   mass  charge spin   c*tau    width  mass   mass\n";
+  //memo=memo+"        ID stable                                      min    max\n";
+  //memo=memo+"name   code code   mass  charge spin   c*tau    width  mass   mass\n";
 
   datafile=fopen("/home/QtPalmtop/pics/zpdg/decay.dec", "r");
   //datafile=fopen("/opt/Qtopia/share/zpdg/decay.dec", "r");
-  //if(datafile==NULL){
-  //  datafile=fopen("/mnt/card/opt/Qtopia/share/zpdg/decay.dec", "r");
-  //}
-
 
   if(datafile!=NULL){
     fgets(buff, 92, datafile);
@@ -255,7 +282,9 @@ void ZPDG::goDecay(QListBoxItem* item)
     }
  
     if(name[0]=='\0'){
-      this->ed_memo->setText(tr("No decay data!"));
+      //this->ed_memo->setText(tr("No decay data!"));
+      memo=memo+tr("\nNo decay data!");
+      this->ed_memo->setText(memo);
       return;
     }
 
@@ -265,7 +294,7 @@ void ZPDG::goDecay(QListBoxItem* item)
       if(strncasecmp(buff, "PARTICLE", 8)==0 &&
          (strncasecmp(buff+9, name, strlen(name))==0 ||
           strncasecmp(buff+10, name, strlen(name))==0 ) ){
-        memo=memo+QString(buff+9);
+        memo=memo;//+QString(buff+9);
       }
       fgets(buff, 92, datafile);
     }
@@ -288,7 +317,8 @@ void ZPDG::goDecay(QListBoxItem* item)
       fgets(buff, 92, datafile);
     }
   }else
-    this->ed_memo->setText(tr("No decay data!"));
+    memo=memo+tr("\nNo decay data!");
+    //this->ed_memo->setText(tr("No decay data!"));
 
   fclose(datafile);
 
