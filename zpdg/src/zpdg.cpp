@@ -166,7 +166,9 @@ void ZPDG::doSearch()
         doSelect(i);
         this->ed_particle->setText(text);
       }else{
-        this->ed_particle->setText(tr("Not Found!"));
+        this->ed_particle->setText(text+tr("Not Found!"));
+	this->ed_particle->setSelection(strlen(text), strlen(tr("Not Found!")));
+	//this->ed_particle->selectAll();
       }
     }
     //SetFocus(GetDlgItem (hDlg, ID_EDIT_FIND));
@@ -188,19 +190,19 @@ void ZPDG::doSelect(int i)
   sprintf(buf, "%G", m_records[i].mass);
   this->ed_mass->setText(QString(buf));
 
-  sprintf(buf, "%G", m_records[i].mass_errp);
+  sprintf(buf, "%+G", m_records[i].mass_errp);
   this->ed_massp->setText(QString(buf));
 
-  sprintf(buf, "%G", m_records[i].mass_errm);
+  sprintf(buf, "%+G", m_records[i].mass_errm);
   this->ed_massm->setText(QString(buf));
 
   sprintf(buf, "%G", m_records[i].width);
   this->ed_width->setText(QString(buf));
 
-  sprintf(buf, "%G", m_records[i].width_errp);
+  sprintf(buf, "%+G", m_records[i].width_errp);
   this->ed_widthp->setText(QString(buf));
 
-  sprintf(buf, "%G", m_records[i].width_errm);
+  sprintf(buf, "%+G", m_records[i].width_errm);
   this->ed_widthm->setText(QString(buf));
 
 }
@@ -221,7 +223,7 @@ void ZPDG::goDecay(QListBoxItem* item)
 
   if( item ){
     text=item->text();
-    this->ed_memo->setText("Searching");
+    this->ed_memo->setText(tr("Searching"));
   }else{
     return;
   }
@@ -252,8 +254,10 @@ void ZPDG::goDecay(QListBoxItem* item)
       fgets(buff, 92, datafile);
     }
  
-    if(name[0]=='\0')
+    if(name[0]=='\0'){
+      this->ed_memo->setText(tr("No decay data!"));
       return;
+    }
 
     rewind(datafile);
 
@@ -261,7 +265,7 @@ void ZPDG::goDecay(QListBoxItem* item)
       if(strncasecmp(buff, "PARTICLE", 8)==0 &&
          (strncasecmp(buff+9, name, strlen(name))==0 ||
           strncasecmp(buff+10, name, strlen(name))==0 ) ){
-        memo=memo+QString(buff);
+        memo=memo+QString(buff+9);
       }
       fgets(buff, 92, datafile);
     }
@@ -273,7 +277,7 @@ void ZPDG::goDecay(QListBoxItem* item)
     memo=memo+"\n";
     while( !feof(datafile) ){
       if( buff[0]!=';' && strncasecmp(buff+7, name, strlen(name))==0){
-        memo=memo+QString(buff+7);
+        //memo=memo+QString(buff+7);
         while( !feof(datafile) && strncasecmp(buff, "ENDDECAY", 8)!=0){
           if( buff[0]!=';' )
             memo=memo+buff;
@@ -284,7 +288,7 @@ void ZPDG::goDecay(QListBoxItem* item)
       fgets(buff, 92, datafile);
     }
   }else
-    memo="File not found!";
+    this->ed_memo->setText(tr("No decay data!"));
 
   fclose(datafile);
 
