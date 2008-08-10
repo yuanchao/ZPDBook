@@ -9,8 +9,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define MAXRECORDS 1024
 //std::List<PTRECORD> m_records;
-struct PTRECORD m_records[512];
+struct PTRECORD m_records[MAXRECORDS];
 
 FILE *datafile;
 
@@ -35,9 +36,7 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
   //datafile=fopen("/home/QtPalmtop/pics/zpdg/mass_width.mc", "r");
   datafile=fopen("/home/QtPalmtop/pics/zpdg/mass_width.csv", "r");
   //datafile=fopen("/opt/Qtopia/share/zpdg/mass_width.mc", "r");
-  //if(datafile==NULL){
-  //  datafile=fopen("/mnt/card/opt/Qtopia/share/zpdg/mass_width.mc", "r");
-  //}
+  //datafile=fopen("/opt/Qtopia/pics/zpdg/mass_width.csv", "r");
 
   if(datafile!=NULL){
     while(!feof(datafile)){
@@ -46,23 +45,30 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
       if(buff[0]!='*'){  //skip comments
         buff[255]='\0';
 
-        sscanf(buff, "%11lf,%9lf,%9lf,%11lf,%9lf,%9lf",
+        //printf(buff);
+        //sscanf(buff, "%11lf,%9lf,%9lf,%11lf,%9lf,%9lf",
+        sscanf(buff, "%le ,%le ,%le ,%le ,%le ,%le",
 	       &m_records[i].mass, &m_records[i].mass_errp,
 	       &m_records[i].mass_errm,
 	       &m_records[i].width, &m_records[i].width_errp,
 	       &m_records[i].width_errm);
 
-	buff[67]='\0';
-        sscanf(buff+64, "%3s", m_records[i].isospin);
+        if(m_records[i].mass_errm>=0)
+          m_records[i].mass_errm=-m_records[i].mass_errm;
+        if(m_records[i].width_errm>=0)
+          m_records[i].width_errm=-m_records[i].width_errm;
 
-	m_records[i].G=buff[68];
+	buff[63]='\0';
+        sscanf(buff+60, "%3s", m_records[i].isospin);
 
-	buff[74]='\0';
-        sscanf(buff+70, "%4s", m_records[i].J);
+	m_records[i].G=buff[64];
 
-	m_records[i].parity=buff[75];
-	m_records[i].C=buff[77];
-	m_records[i].anti=buff[79];
+	buff[70]='\0';
+        sscanf(buff+66, "%4s", m_records[i].J);
+
+	m_records[i].parity=buff[71];
+	m_records[i].C=buff[73];
+	m_records[i].anti=buff[75];
 
 	/*
         sscanf(buff+81, "%7d,%s,%1c,%1c,%17s,%s",
@@ -70,24 +76,28 @@ ZPDG::ZPDG( QWidget* parent,  const char* name, WFlags fl )
 	       &m_records[i].rank, &m_records[i].status,
 	       m_records[i].name, m_records[i].quarks);
 	*/
-	buff[93]='\0';
-        sscanf(buff+81, "%7d,%s",
+	buff[89]='\0';
+        sscanf(buff+77, "%7d,%s",
 	       &m_records[i].pid, m_records[i].charge);
 
-	m_records[i].rank=buff[94];
-	m_records[i].status=buff[96];
+	m_records[i].rank=buff[90];
+	m_records[i].status=buff[92];
 
-	buff[115]='\0';
-	buff[133]='\0';
-        sscanf(buff+98, "%17s", m_records[i].name);
-        sscanf(buff+116, "%15s", m_records[i].quarks);
+	buff[111]='\0';
+	buff[129]='\0';
+        sscanf(buff+94, "%17s", m_records[i].name);
+        sscanf(buff+112, "%15s", m_records[i].quarks);
 
-	if(strncmp(buff+116, "Maybe", 5)==0){
-	  buff[128]='\0';
-	  strcpy(m_records[i].quarks, buff+116);
+	if(strncmp(buff+112, "Maybe", 5)==0){
+	  buff[124]='\0';
+	  strcpy(m_records[i].quarks, buff+112);
 	}
 
-	i++;
+	if(i<MAXRECORDS){
+          i++;
+        }else{
+          printf("Max number of records exceeds!\n");
+        }
       }
     }
     m_num_ptl=i;
@@ -216,6 +226,7 @@ void ZPDG::doSelect(int i)
   sprintf(buf, "%+G", m_records[i].width_errm);
   this->ed_widthm->setText(QString(buf));
 
+//  goDecay(this->lb_particles->item(i));
 }
 void ZPDG::goDecay(QListBoxItem* item)
 {
@@ -247,8 +258,9 @@ void ZPDG::goDecay(QListBoxItem* item)
 
   memo=memo+QString(buff);
 
-  sprintf(buff, "Rank= %c \t Status= %c\n",
-	  m_records[curr_idx].rank, m_records[curr_idx].status);
+  sprintf(buff, "Status= %c\n", m_records[curr_idx].status);
+//  sprintf(buff, "Rank= %c \t Status= %c\n",
+//	  m_records[curr_idx].rank, m_records[curr_idx].status);
 
   memo=memo+QString(buff);
 
@@ -288,6 +300,7 @@ void ZPDG::goDecay(QListBoxItem* item)
       return;
     }
 
+/*  No need for the particle properties now
     rewind(datafile);
 
     while( !feof(datafile) && strncasecmp(buff, "PDG", 3)!=0 ){
@@ -298,14 +311,15 @@ void ZPDG::goDecay(QListBoxItem* item)
       }
       fgets(buff, 92, datafile);
     }
-
+*/
     while( !feof(datafile) && strncasecmp(buff, "DECAY", 5)!=0 ){
       fgets(buff, 92, datafile);
     }
 
     memo=memo+"\n";
     while( !feof(datafile) ){
-      if( buff[0]!=';' && strncasecmp(buff+7, name, strlen(name))==0){
+      if( buff[0]!=';' && strncasecmp(buff+7, name, strlen(name))==0 &&
+          ( buff[7+strlen(name)]=='\n' || buff[7+strlen(name)]=='B') ){
         //memo=memo+QString(buff+7);
         while( !feof(datafile) && strncasecmp(buff, "ENDDECAY", 8)!=0){
           if( buff[0]!=';' )

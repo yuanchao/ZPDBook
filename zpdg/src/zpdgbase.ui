@@ -11,7 +11,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>235</width>
+            <width>231</width>
             <height>314</height>
         </rect>
     </property>
@@ -238,6 +238,18 @@ Charges: 00</string>
         <slot>doSearch()</slot>
     </connection>
     <connection>
+        <sender>ed_particle</sender>
+        <signal>returnPressed()</signal>
+        <receiver>ZPDGBase</receiver>
+        <slot>doSearch()</slot>
+    </connection>
+    <connection>
+        <sender>lb_particles</sender>
+        <signal>selected(QListBoxItem*)</signal>
+        <receiver>ZPDGBase</receiver>
+        <slot>goDecay(QListBoxItem*)</slot>
+    </connection>
+    <connection>
         <sender>lb_particles</sender>
         <signal>highlighted(int)</signal>
         <receiver>ZPDGBase</receiver>
@@ -248,12 +260,6 @@ Charges: 00</string>
         <signal>clicked(QListBoxItem*)</signal>
         <receiver>ZPDGBase</receiver>
         <slot>goDecay(QListBoxItem*)</slot>
-    </connection>
-    <connection>
-        <sender>ed_particle</sender>
-        <signal>returnPressed()</signal>
-        <receiver>ZPDGBase</receiver>
-        <slot>doSearch()</slot>
     </connection>
     <slot access="public">doSearch()</slot>
     <slot access="public">doSelect(int)</slot>

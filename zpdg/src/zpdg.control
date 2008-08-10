@@ -1,9 +1,9 @@
 Package: zpdg
 Priority: optional
 Section: Misc
-Version: 1.2
+Version: 1.2.1
 Architecture: arm
-Maintainer: Y. Chao
+Maintainer: Yuan CHAO
 Depends:
 Description: zPDG
   A searchable Particle Data Booklet for Zaurus.
